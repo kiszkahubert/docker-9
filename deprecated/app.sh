@@ -3,9 +3,10 @@
 PORT="${PORT:-8080}"
 AUTOR="HUBERT KISZKA"
 echo "% $(date) -- $AUTOR -- $PORT %"
+
 if [ -z "$KEY" ]; then
   echo "PLEASE PROVIDE API KEY" >&2
-  exit 1
+  exit 1 
 fi
 while true; do
     coproc nc -l -p "$PORT"
@@ -15,7 +16,7 @@ while true; do
     while read -r header && [ "$header" != $'\r' ] && [ "$header" != "" ]; do
         true
     done <&${COPROC[0]}
-    response=$(wget -q -O - "$URL")
+    response=$(curl -s "$URL")
     IFS=":" read -ra tab <<< "$response"
     for ((i=0; i<${#tab[@]}; i++)); do
         line="${tab[$i]}"
@@ -30,7 +31,6 @@ while true; do
             humidity="${vals[0]}"
         fi
     done
-    
     cat <<EOF >&${COPROC[1]}
 HTTP/1.1 200 OK
 Content-Type: text/plain

@@ -1,0 +1,11 @@
+FROM alpine:latest AS sc
+WORKDIR /app
+RUN --mount=type=ssh apk add --no-cache git && git clone git@github.com:kiszkahubert/docker-9 .
+
+FROM alpine:latest
+LABEL org.opencontainers.image.authors="Hubert Kiszka"
+WORKDIR /app
+COPY --from=sc /app/docker-9/app.sh .
+RUN apk add --no-cache bash curl && chmod +x app.sh
+EXPOSE 8080
+CMD ["./app.sh"]
